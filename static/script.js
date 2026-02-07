@@ -6,7 +6,7 @@ const modelSelect = document.getElementById('modelSelect');
 const modeSelect = document.getElementById('modeSelect');
 
 // API Configuration
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = 'https://fund-chatbot-564206280112.europe-west1.run.app';
 
 // Event Listeners
 userInput.addEventListener('keypress', (e) => {
