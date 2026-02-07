@@ -48,13 +48,21 @@ function addMessage(content, isUser = false, metadata = null) {
     
     // Format content - convert markdown-like syntax to HTML
     let formattedContent = content
+        // Handle bold text
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Convert newlines to <br>
         .replace(/\n/g, '<br>')
+        // Handle bullet points with * (Gemini style)
+        .replace(/\* (.*?)(?=<br>|$)/g, '<li>$1</li>')
+        // Handle bullet points with - (ChatGPT style)
         .replace(/- (.*?)(?=<br>|$)/g, '<li>$1</li>');
     
-    // Wrap list items in ul if present
+    // Wrap consecutive list items in ul tags and clean up extra <br> around lists
     if (formattedContent.includes('<li>')) {
-        formattedContent = formattedContent.replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>');
+        formattedContent = formattedContent
+            .replace(/<br>(<li>)/g, '$1')
+            .replace(/(<\/li>)<br>/g, '$1')
+            .replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>');
     }
     
     // Add metadata badge for assistant messages
