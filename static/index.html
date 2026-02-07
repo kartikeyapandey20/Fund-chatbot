@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fund Recommendation Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Background Effects -->
+      <div class="bg-gradient"></div>
+      <div class="bg-blur bg-blur-1"></div>
+      <div class="bg-blur bg-blur-2"></div>
+      <div class="bg-blur bg-blur-3"></div>
+
+      <!-- Main Chat Container -->
+      <div class="chat-container">
+        <!-- Header -->
+        <header class="chat-header">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2L2 7L12 12L22 7L12 2Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M2 17L12 22L22 17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M2 12L12 17L22 12"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h1>Fund Advisor</h1>
+              <span>AI-Powered Investment Recommendations</span>
+            </div>
+          </div>
+          <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span>Online</span>
+          </div>
+        </header>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel">
+          <div class="setting-group">
+            <label for="modelSelect">Model:</label>
+            <select id="modelSelect" class="setting-select">
+              <option value="chatgpt">ChatGPT</option>
+              <option value="gemini">Gemini</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label for="modeSelect">Mode:</label>
+            <select id="modeSelect" class="setting-select">
+              <option value="rag">RAG (Fast)</option>
+              <option value="full_context">Full Context</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Messages Area -->
+        <main class="chat-messages" id="chatMessages">
+          <!-- Welcome Message -->
+          <div class="message assistant">
+            <div class="message-avatar">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2L2 7L12 12L22 7L12 2Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M2 17L12 22L22 17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M2 12L12 17L22 12"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+              </svg>
+            </div>
+            <div class="message-content">
+              <p>
+                Hello! I'm your Fund Advisor, powered by AI. I have access to a
+                comprehensive database of
+                <strong>2,700+ investment funds</strong> including:
+              </p>
+              <ul>
+                <li>Venture Capital (VC) firms</li>
+                <li>Private Equity (PE) investors</li>
+                <li>Family Offices</li>
+                <li>Corporate VCs</li>
+                <li>Sovereign Entities</li>
+              </ul>
+              <p>
+                Choose your preferred <strong>Model</strong> (ChatGPT or Gemini) and 
+                <strong>Mode</strong> (RAG for fast responses, Full Context for comprehensive answers).
+              </p>
+              <div class="suggestion-chips">
+                <button
+                  class="chip"
+                  onclick="
+                    sendSuggestion('What funds invest in fintech startups?')
+                  "
+                >
+                  Fintech Funds
+                </button>
+                <button
+                  class="chip"
+                  onclick="
+                    sendSuggestion(
+                      'Recommend VCs for seed stage healthcare startups',
+                    )
+                  "
+                >
+                  Healthcare VCs
+                </button>
+                <button
+                  class="chip"
+                  onclick="
+                    sendSuggestion(
+                      'Which investors focus on Series A in India?',
+                    )
+                  "
+                >
+                  Series A India
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <!-- Input Area -->
+        <footer class="chat-input-container">
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="userInput"
+              placeholder="Ask about funds, investors, or sectors..."
+              autocomplete="off"
+            />
+            <button id="sendBtn" onclick="sendMessage()">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M22 2L11 13"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 2L15 22L11 13L2 9L22 2Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <p class="input-hint">
+            Press Enter to send • AI recommendations based on 2700+ funds
+          </p>
+        </footer>
+      </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+  </body>
+</html>
