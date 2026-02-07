@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
@@ -15,8 +15,22 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging with enhanced formatting for Docker visibility
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[
+        logging.StreamHandler()  # Ensures output to stdout for Docker logs
+    ]
+)
+
+# Set third-party loggers to WARNING to reduce noise
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("openai").setLevel(logging.WARNING)
+logging.getLogger("faiss").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 # Load environment variables
@@ -24,10 +38,43 @@ load_dotenv()
 
 app = FastAPI(title="Fund Recommendation Chatbot")
 
+
+# Global exception handler to catch all unhandled errors
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Catch all unhandled exceptions and log them."""
+    logger.error(f"Unhandled exception on {request.method} {request.url}")
+    logger.error(f"Exception type: {type(exc).__name__}")
+    logger.error(f"Exception message: {str(exc)}")
+    logger.error(f"Full traceback:\n{traceback.format_exc()}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {str(exc)}"}
+    )
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Log when the application starts."""
+    logger.info("="*60)
+    logger.info("Fund Recommendation Chatbot starting up...")
+    logger.info(f"OpenAI API Key configured: {'Yes' if openai_api_key else 'No'}")
+    logger.info(f"Gemini API Key configured: {'Yes' if gemini_api_key else 'No'}")
+    logger.info(f"Gemini client initialized: {'Yes' if gemini_client else 'No'}")
+    logger.info(f"Vector store initialized: {'Yes' if VECTOR_STORE else 'No'}")
+    logger.info(f"Funds loaded: {len(FUND_DF)} records")
+    logger.info("="*60)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Log when the application shuts down."""
+    logger.info("Fund Recommendation Chatbot shutting down...")
+
 # Add CORS middleware to allow frontend requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:8000", "http://localhost:8000"],
+    allow_origins=["http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:8000", "http://localhost:8000","https://fund-chatbot-564206280112.europe-west1.run.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
